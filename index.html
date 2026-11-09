@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="uz" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="google" content="notranslate">
+<title>Бетон ва Боғ Ҳисоби</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --bg:#eceeec; --surface:#ffffff; --surface2:#f4f5f3; --ink:#1c2226; --muted:#5b6569; --line:#d6dad7;
+  --side:#22292c; --side-ink:#dfe4e2; --side-muted:#8e999c; --side-hi:#323b3f;
+  --accent:#2d6a4f; --accent-ink:#ffffff;
+  --good:#2f7d4f; --bad:#b23b3b; --warn:#9a6a12; --bad-soft:#f7e3e3; --warn-soft:#f6ecd6; --good-soft:#e1efe6;
+  --c-steel:#3d5f7a; --c-ochre:#b07d2b; --c-leaf:#3c8a5a; --c-plum:#7a4f7a; --c-clay:#9a5a3c;
+  --f-display:"Unbounded","Golos Text",system-ui,sans-serif;
+  --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:8px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#131718; --surface:#1b2022; --surface2:#21272a; --ink:#e5e9e7; --muted:#9aa4a7; --line:#2f373a;
+  --side:#0e1112; --side-ink:#dfe4e2; --side-muted:#7f8a8d; --side-hi:#1f2629;
+  --accent:#62b38d; --accent-ink:#0d1a13;
+  --good:#62b38d; --bad:#e58080; --warn:#dcaa4d; --bad-soft:#3a2224; --warn-soft:#3a3020; --good-soft:#1d3329;
+  --c-steel:#7ea6c6; --c-ochre:#d9a650; --c-leaf:#6fbf8c; --c-plum:#c08fc0; --c-clay:#d18d6c;
+  color-scheme:dark}}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100%}
+.side{background:var(--side);color:var(--side-ink);padding:20px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.logo{font-family:var(--f-display);font-weight:700;font-size:17px;line-height:1.15;margin:0}
+.logo small{display:block;font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--side-muted);margin-top:4px}
+nav{display:flex;flex-direction:column;gap:2px;margin-top:18px}
+.ngroup{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--side-muted);margin:14px 10px 4px}
+nav a{display:block;padding:7px 10px;border-radius:6px;color:var(--side-ink);text-decoration:none}
+nav a:hover{background:var(--side-hi)}
+nav a.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.me{margin-top:auto;padding-top:16px;font-size:12px;color:var(--side-muted);display:flex;flex-direction:column;gap:6px}
+.me b{color:var(--side-ink);font-weight:500;word-break:break-all}
+.me button{align-self:flex-start;background:transparent;border:1px solid var(--side-hi);color:var(--side-ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+.main{min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line);background:var(--surface)}
+.top h1{font-family:var(--f-display);font-weight:500;font-size:19px;margin:0}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters select,.filters input{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.lang button{border:0;background:transparent;padding:6px 10px;cursor:pointer}
+.lang button.on{background:var(--ink);color:var(--bg)}
+.content{padding:20px 24px 48px;display:flex;flex-direction:column;gap:20px;min-width:0}
+.notice{padding:10px 14px;border-radius:var(--r);background:var(--warn-soft);font-size:13px}
+.notice[data-kind="bad"]{background:var(--bad-soft)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .s{font-size:12px;color:var(--muted)}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.ph{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.ph h2{font-size:15px;font-weight:600;margin:0}
+.ph .acts{display:flex;gap:8px;flex-wrap:wrap}
+.pb{padding:14px 16px}
+.grid2{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px}
+.dirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.dcard{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--dc,var(--muted));border-radius:var(--r);padding:14px 16px;cursor:pointer;text-align:left}
+.dcard:hover{border-color:var(--dc)}
+.dcard h3{margin:0 0 8px;font-size:15px}
+.dl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:13px;margin:0}
+.dl dt{color:var(--muted)} .dl dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:500;white-space:nowrap;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:3px 8px;font-size:12px}
+.btn:disabled{opacity:.6;cursor:default}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:12px;background:var(--surface2)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.tot td{font-weight:600;background:var(--surface2)}
+tbody tr:hover td{background:var(--surface2)}
+td.wrap{white-space:normal;min-width:160px}
+td select{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;background:var(--dc,var(--muted))}
+.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:500}
+.pill.good{background:var(--good-soft);color:var(--good)} .pill.bad{background:var(--bad-soft);color:var(--bad)} .pill.warn{background:var(--warn-soft);color:var(--warn)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:12px}
+.chip b{font-variant-numeric:tabular-nums;margin-left:6px}
+.list{display:flex;flex-direction:column}
+.li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.li:last-child{border-bottom:0}
+.li .m{color:var(--muted);font-size:12px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.modal{position:fixed;inset:0;background:rgba(10,14,15,.5);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50}
+.dialog{background:var(--surface);border-radius:10px;width:100%;max-width:520px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.dialog h3{margin:0;padding:16px 20px;border-bottom:1px solid var(--line);font-size:16px}
+.form{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld.full{grid-column:1/-1}
+.fld label{font-size:12px;color:var(--muted);font-weight:500}
+.fld input,.fld select,.fld textarea{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+.fld textarea{min-height:60px;resize:vertical}
+.fld .hint{font-size:12px;color:var(--muted)}
+.fld .hint.warn{color:var(--warn)}
+.dfoot{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--line)}
+.dfoot .r{display:flex;gap:8px;margin-left:auto}
+.err{grid-column:1/-1;color:var(--bad);font-size:13px}
+.ok{grid-column:1/-1;color:var(--good);font-size:13px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px;z-index:60;max-width:calc(100% - 32px)}
+.muted{color:var(--muted)}
+.help{font-size:13px;color:var(--muted);max-width:70ch;margin:0}
+/* login */
+.auth{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--side)}
+.acard{background:var(--surface);border-radius:12px;width:100%;max-width:400px;padding:28px 24px;display:flex;flex-direction:column;gap:16px}
+.acard .logo{color:var(--ink)} .acard .logo small{color:var(--muted)}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:8px;cursor:pointer;color:var(--muted);font-weight:500}
+.tabs button.on{color:var(--ink);border-color:var(--accent)}
+.acard .form{padding:0;grid-template-columns:1fr}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;height:auto;padding:12px 16px 8px}
+  .logo small,.ngroup{display:none}
+  nav{flex-direction:row;overflow-x:auto;margin-top:10px;gap:4px;padding-bottom:4px}
+  nav a{white-space:nowrap;background:var(--side-hi)}
+  .me{flex-direction:row;align-items:center;justify-content:space-between;padding-top:8px}
+  .top,.content{padding-left:16px;padding-right:16px}
+  .form{grid-template-columns:1fr}
+  .kpi .v{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- Кириш экрани -->
+<div class="auth" id="authView" hidden>
+  <div class="acard">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <p class="logo">Бетон ва Боғ<small id="aSub"></small></p>
+      <div class="lang"><button class="lUz" type="button">Ўзб</button><button class="lRu" type="button">Рус</button></div>
+    </div>
+    <div class="tabs"><button id="tIn" type="button"></button><button id="tUp" type="button"></button></div>
+    <form class="form" id="aForm" novalidate>
+      <div class="fld" id="aNameW"><label for="aName" id="aNameL"></label><input id="aName" autocomplete="name"></div>
+      <div class="fld"><label for="aEmail">Email</label><input id="aEmail" type="email" autocomplete="email"></div>
+      <div class="fld"><label for="aPass" id="aPassL"></label><input id="aPass" type="password" autocomplete="current-password"></div>
+      <div class="err" id="aErr"></div><div class="ok" id="aOk"></div>
+      <button class="btn pri" id="aBtn" type="submit" style="justify-content:center"></button>
+    </form>
+  </div>
+</div>
+
+<!-- Асосий дастур -->
+<div class="app" id="appView" hidden>
+  <aside class="side">
+    <p class="logo">Бетон ва Боғ<small id="logoSub"></small></p>
+    <nav id="nav"></nav>
+    <div class="me"><span><b id="meName"></b><br><span id="meRole"></span></span><button id="logout" type="button"></button></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <h1 id="vtitle"></h1>
+      <div class="filters">
+        <select id="fDir" aria-label="direction"></select>
+        <select id="fPer" aria-label="period"></select>
+        <input type="date" id="fFrom" hidden aria-label="from">
+        <input type="date" id="fTo" hidden aria-label="to">
+        <button class="btn" id="refresh" type="button" title="">↻</button>
+        <div class="lang"><button class="lUz" type="button">Ўзб</button><button class="lRu" type="button">Рус</button></div>
+      </div>
+    </header>
+    <div class="content">
+      <div id="notice" class="notice" hidden></div>
+      <div id="view"></div>
+    </div>
+  </div>
+</div>
+<div id="modal" class="modal" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+/* ====== Supabase уланиш ====== */
+const SUPABASE_URL="https://aaqltlngjheonzdyzyjt.supabase.co";
+const SUPABASE_KEY="sb_publishable_OA0AVQSj0GHVZ_NCP5616Q_3bxz_ECJ";
+
+/* ---------- i18n ---------- */
+const T={
+uz:{sub:"Ишлаб чиқариш ва савдо ҳисоби",g_main:"Асосий",g_ops:"Операциялар",g_res:"Ресурслар",g_set:"Созлаш",
+dashboard:"Бош саҳифа",reports:"Ҳисоботлар",production:"Ишлаб чиқариш",sales:"Сотув",expenses:"Харажатлар",incomes:"Бошқа даромадлар",stock:"Тайёр маҳсулот захираси",warehouse:"Омбор (хом ашё)",assets:"Асосий воситалар",catalog:"Маълумотномалар",users:"Ходимлар",
+allDirs:"Барча йўналишлар",general:"Умумий (корхона)",p_month:"Шу ой",p_prev:"Ўтган ой",p_quarter:"Шу чорак",p_year:"Шу йил",p_all:"Бутун давр",p_custom:"Даврни танлаш",
+revenue:"Даромад",costs:"Харажат",profit:"Соф фойда",debts:"Дебитор қарз",unpaid:"тўланмаган сотувлар",forPeriod:"танланган давр",margin:"рентабеллик",
+salesRev:"Сотувдан тушум",otherInc:"Бошқа даромад",matUse:"Хом ашё сарфи",depr:"Амортизация",totalRev:"Жами даромад",totalCost:"Жами харажат",
+chart12:"Охирги 12 ой: даромад ва харажат",alerts:"Эътибор талаб қилади",recent:"Сўнгги операциялар",
+date:"Сана",product:"Маҳсулот",direction:"Йўналиш",qty:"Миқдор",unit:"Ўлчов",price:"Нархи",sum:"Сумма",total:"Жами",client:"Мижоз",paid:"Тўланди",debt:"Қарз",status:"Ҳолат",note:"Изоҳ",category:"Тоифа",amount:"Сумма",name:"Номи",
+produced:"Ишлаб чиқарилди",sold:"Сотилди",balance:"Қолдиқ",value:"Қиймати",inQ:"Кирим",outQ:"Чиқим",avgPrice:"Ўртача нарх",minQ:"Минимал қолдиқ",material:"Хом ашё",type:"Тури",
+invno:"Инв. рақам",buyDate:"Олинган сана",cost:"Бошланғич қиймат",life:"Хизмат муддати (йил)",monthDep:"Ойлик амортизация",accDep:"Жамғарилган амортизация",resid:"Қолдиқ қиймат",
+add:"Қўшиш",edit:"Таҳрир",save:"Сақлаш",cancel:"Бекор қилиш",del:"Ўчириш",delSure:"Ҳа, ўчирилсин",excel:"Excel",
+addProduction:"Ишлаб чиқаришни киритиш",addSale:"Сотувни киритиш",addExpense:"Харажат киритиш",addIncome:"Даромад киритиш",addAsset:"Восита қўшиш",addIn:"Кирим",addOut:"Чиқим",addDir:"Йўналиш қўшиш",addProduct:"Маҳсулот қўшиш",addMaterial:"Хом ашё қўшиш",
+nameRu:"Номи (рус тилида)",color:"Ранг",order:"Тартиб",
+paidFull:"Тўланган",paidPart:"Қисман",paidNone:"Тўланмаган",outOf:"Тугаган",low:"Кам қолди",ok:"Етарли",negStock:"Манфий қолдиқ",
+inStock:"Захирада:",autoAvg:"Бўш қолдирилса, ўртача кирим нархи олинади",matHint:"Хом ашё харидини Омбор бўлимида «Кирим» орқали киритинг — у ерда сарф ҳисобланади.",
+loading:"Маълумотлар юкланмоқда…",loadErr:"Маълумотларни юклаб бўлмади:",pending:"Сизга ҳали рол берилмаган — фақат кўра оласиз. Админдан рол беришини сўранг.",
+emptyT:"Ҳозирча ёзув йўқ",emptyPeriod:"Танланган давр ва йўналиш бўйича ёзув йўқ. Даврни ўзгартиринг ёки янги ёзув қўшинг.",
+emptyDash:"Ҳисобни бошлаш учун «Маълумотномалар»да маҳсулот нархлари ва хом ашёни текширинг, кейин ишлаб чиқариш, сотув ва харажатларни киритинг.",
+dirsT:"Ҳисоб йўналишлари",productsT:"Маҳсулотлар",materialsT:"Хом ашё ва материаллар",
+pnl:"Фойда ва зарар ҳисоботи",debtors:"Қарздор мижозлар",moves:"Омбор ҳаракатлари",balances:"Омбор қолдиқлари",
+saved:"Сақланди",deleted:"Ўчирилди",exported:"Файл юклаб олинди",required:"Тўлдирилиши шарт:",writeErr:"Сақлаб бўлмади:",noRight:"Бу амал учун ҳуқуқингиз йўқ.",
+stockNote:"Жорий ҳолат: бутун давр бўйича ишлаб чиқарилган минус сотилган.",assetNote:"Амортизация тўғри чизиқли усулда, олинганидан кейинги ойдан бошлаб ҳисобланади.",
+in:"Кирим",out:"Чиқим",forDir:"Қайси йўналишга",perMonth:"ойига",refresh:"Янгилаш",
+signIn:"Кириш",signUp:"Рўйхатдан ўтиш",fullName:"Исм-фамилия",password:"Парол",logout:"Чиқиш",
+needEmail:"Email ва паролни киритинг.",passShort:"Парол камида 6 белгидан иборат бўлсин.",signedUp:"Почтангизга тасдиқлаш хати юборилди. Хатдаги ҳаволани босиб, кейин шу ерда киринг.",badLogin:"Email ёки парол нотўғри, ёки почта ҳали тасдиқланмаган.",
+role:"Рол",active:"Фаол",yes:"Ҳа",no:"Йўқ",usersHelp:"Янги ходим дастурда «Рўйхатдан ўтиш» орқали ўзи рўйхатдан ўтади ва «Кузатувчи» ролида бўлади. Бу ерда унга керакли ролни беринг. Ишдан кетган ходимни «Фаол: Йўқ» қилинг.",
+r_admin:"Админ",r_manager:"Менежер",r_accountant:"Бухгалтер",r_storekeeper:"Омборчи",r_viewer:"Кузатувчи",
+},
+ru:{sub:"Учёт производства и продаж",g_main:"Главное",g_ops:"Операции",g_res:"Ресурсы",g_set:"Настройки",
+dashboard:"Главная",reports:"Отчёты",production:"Производство",sales:"Продажи",expenses:"Расходы",incomes:"Прочие доходы",stock:"Склад готовой продукции",warehouse:"Склад (сырьё)",assets:"Основные средства",catalog:"Справочники",users:"Сотрудники",
+allDirs:"Все направления",general:"Общие (предприятие)",p_month:"Этот месяц",p_prev:"Прошлый месяц",p_quarter:"Этот квартал",p_year:"Этот год",p_all:"Весь период",p_custom:"Выбрать период",
+revenue:"Доход",costs:"Расход",profit:"Чистая прибыль",debts:"Дебиторка",unpaid:"неоплаченные продажи",forPeriod:"выбранный период",margin:"рентабельность",
+salesRev:"Выручка от продаж",otherInc:"Прочий доход",matUse:"Расход сырья",depr:"Амортизация",totalRev:"Итого доход",totalCost:"Итого расход",
+chart12:"Последние 12 месяцев: доходы и расходы",alerts:"Требует внимания",recent:"Последние операции",
+date:"Дата",product:"Продукция",direction:"Направление",qty:"Кол-во",unit:"Ед.",price:"Цена",sum:"Сумма",total:"Итого",client:"Клиент",paid:"Оплачено",debt:"Долг",status:"Статус",note:"Примечание",category:"Категория",amount:"Сумма",name:"Название",
+produced:"Произведено",sold:"Продано",balance:"Остаток",value:"Стоимость",inQ:"Приход",outQ:"Расход",avgPrice:"Средняя цена",minQ:"Мин. остаток",material:"Сырьё",type:"Тип",
+invno:"Инв. номер",buyDate:"Дата приобретения",cost:"Первоначальная стоимость",life:"Срок службы (лет)",monthDep:"Амортизация в месяц",accDep:"Накопленная амортизация",resid:"Остаточная стоимость",
+add:"Добавить",edit:"Изменить",save:"Сохранить",cancel:"Отмена",del:"Удалить",delSure:"Да, удалить",excel:"Excel",
+addProduction:"Внести выпуск",addSale:"Внести продажу",addExpense:"Внести расход",addIncome:"Внести доход",addAsset:"Добавить ОС",addIn:"Приход",addOut:"Расход",addDir:"Добавить направление",addProduct:"Добавить продукцию",addMaterial:"Добавить сырьё",
+nameRu:"Название (на русском)",color:"Цвет",order:"Порядок",
+paidFull:"Оплачено",paidPart:"Частично",paidNone:"Не оплачено",outOf:"Нет в наличии",low:"Мало",ok:"Достаточно",negStock:"Отрицательный остаток",
+inStock:"На складе:",autoAvg:"Если пусто — берётся средняя цена прихода",matHint:"Закупку сырья вносите через «Приход» в разделе Склад — расход сырья считается там.",
+loading:"Загрузка данных…",loadErr:"Не удалось загрузить данные:",pending:"Вам ещё не назначена роль — доступен только просмотр. Попросите администратора.",
+emptyT:"Пока нет записей",emptyPeriod:"Нет записей за выбранный период и направление. Измените период или добавьте запись.",
+emptyDash:"Чтобы начать, проверьте цены продукции и сырьё в «Справочниках», затем вносите выпуск, продажи и расходы.",
+dirsT:"Направления учёта",productsT:"Продукция",materialsT:"Сырьё и материалы",
+pnl:"Отчёт о прибылях и убытках",debtors:"Клиенты-должники",moves:"Движение по складу",balances:"Остатки склада",
+saved:"Сохранено",deleted:"Удалено",exported:"Файл сохранён",required:"Обязательно заполнить:",writeErr:"Не удалось сохранить:",noRight:"Нет прав на это действие.",
+stockNote:"Текущее состояние: произведено за всё время минус продано.",assetNote:"Амортизация линейная, начисляется со следующего месяца после приобретения.",
+in:"Приход",out:"Расход",forDir:"Для направления",perMonth:"в месяц",refresh:"Обновить",
+signIn:"Вход",signUp:"Регистрация",fullName:"Имя и фамилия",password:"Пароль",logout:"Выйти",
+needEmail:"Введите email и пароль.",passShort:"Пароль должен быть не короче 6 символов.",signedUp:"На вашу почту отправлено письмо. Перейдите по ссылке, затем войдите здесь.",badLogin:"Неверный email или пароль, либо почта ещё не подтверждена.",
+role:"Роль",active:"Активен",yes:"Да",no:"Нет",usersHelp:"Новый сотрудник сам регистрируется через «Регистрация» и получает роль «Наблюдатель». Здесь назначьте ему нужную роль. Уволенного сотрудника отметьте «Активен: Нет».",
+r_admin:"Админ",r_manager:"Менеджер",r_accountant:"Бухгалтер",r_storekeeper:"Кладовщик",r_viewer:"Наблюдатель",
+}};
+const UNITS={m3:["м³","м³"],pcs:["дона","шт"],kg:["кг","кг"],t:["тонна","т"],m2:["м²","м²"],lm:["п.м","п.м"],l:["литр","л"],bag:["қоп","мешок"]};
+const ECATS={material:["Хом ашё (бошқа)","Сырьё (прочее)"],salary:["Иш ҳақи","Зарплата"],fuel:["Ёқилғи","Топливо"],power:["Электр энергия","Электроэнергия"],transport:["Транспорт","Транспорт"],repair:["Таъмирлаш","Ремонт"],tax:["Солиқ ва йиғимлар","Налоги и сборы"],rent:["Ижара","Аренда"],water:["Сув ва суғориш","Вода и полив"],fert:["Ўғит ва кимёвий воситалар","Удобрения и химия"],other:["Бошқа","Прочее"]};
+const ICATS={service:["Хизмат кўрсатиш","Услуги"],rent:["Ижарадан","Аренда"],transport:["Транспорт хизмати","Транспортные услуги"],subsidy:["Субсидия","Субсидия"],other:["Бошқа","Прочее"]};
+const COLORS=["steel","ochre","leaf","plum","clay"];
+const ROLES=["admin","manager","accountant","storekeeper","viewer"];
+
+/* ---------- база жадваллари ва майдонлар мослиги ---------- */
+const num=v=>v==null?0:+v;
+const MAP={
+  directions:{table:"directions",order:"sort_order",from:r=>({id:r.id,name:r.name,name_ru:r.name_ru,color:r.color,order:r.sort_order}),to:d=>({name:d.name,name_ru:d.name_ru||"",color:d.color||"steel",sort_order:Math.round(d.order||0)})},
+  products:{table:"products",from:r=>({id:r.id,name:r.name,dir:r.dir,unit:r.unit,price:num(r.price)}),to:d=>({name:d.name,dir:d.dir,unit:d.unit,price:d.price||0})},
+  materials:{table:"materials",from:r=>({id:r.id,name:r.name,unit:r.unit,min:num(r.min_qty)}),to:d=>({name:d.name,unit:d.unit,min_qty:d.min||0})},
+  production:{table:"production",from:r=>({id:r.id,date:r.date,dir:r.dir,product:r.product_id,qty:num(r.qty),note:r.note,ts:r.created_at}),to:d=>({date:d.date,dir:d.dir,product_id:d.product,qty:d.qty,note:d.note||""})},
+  sales:{table:"sales",from:r=>({id:r.id,date:r.date,dir:r.dir,product:r.product_id,qty:num(r.qty),price:num(r.price),client:r.client_name,paid:num(r.paid),note:r.note,ts:r.created_at}),to:d=>({date:d.date,dir:d.dir,product_id:d.product,qty:d.qty,price:d.price,client_name:d.client||"",paid:d.paid||0,note:d.note||""})},
+  expenses:{table:"expenses",from:r=>({id:r.id,date:r.date,dir:r.dir||"",cat:r.category,amount:num(r.amount),note:r.note,ts:r.created_at}),to:d=>({date:d.date,dir:d.dir||null,category:d.cat,amount:d.amount,note:d.note||""})},
+  incomes:{table:"incomes",from:r=>({id:r.id,date:r.date,dir:r.dir||"",cat:r.category,amount:num(r.amount),note:r.note,ts:r.created_at}),to:d=>({date:d.date,dir:d.dir||null,category:d.cat,amount:d.amount,note:d.note||""})},
+  assets:{table:"assets",from:r=>({id:r.id,name:r.name,invno:r.inv_no,dir:r.dir||"",date:r.bought_on,cost:num(r.cost),life:num(r.life_years),note:r.note}),to:d=>({name:d.name,inv_no:d.invno||"",dir:d.dir||null,bought_on:d.date,cost:d.cost,life_years:d.life,note:d.note||""})},
+  moves:{table:"stock_moves",from:r=>({id:r.id,date:r.date,type:r.type,material:r.material_id,qty:num(r.qty),price:num(r.price),dir:r.dir||"",note:r.note,ts:r.created_at}),to:d=>({date:d.date,type:d.type,material_id:d.material,qty:d.qty,price:d.price||0,dir:d.dir||null,note:d.note||""})},
+};
+const COLS=Object.keys(MAP);
+const WR={directions:["admin"],products:["admin","manager"],materials:["admin","manager","storekeeper"],production:["admin","manager","storekeeper"],
+  sales:["admin","manager","accountant"],expenses:["admin","manager","accountant"],incomes:["admin","manager","accountant"],assets:["admin","accountant"],moves:["admin","manager","storekeeper"]};
+
+/* ---------- state ---------- */
+const S={lang:"uz",dir:"all",per:"month",from:"",to:"",view:"dashboard",sb:null,user:null,role:null,name:"",
+  data:Object.fromEntries(COLS.map(c=>[c,[]])),profiles:[],tables:{},authMode:"in"};
+try{const l=localStorage.getItem("bb.lang");if(l==="ru"||l==="uz")S.lang=l;const d=localStorage.getItem("bb.dir");if(d)S.dir=d;const p=localStorage.getItem("bb.per");if(p)S.per=p;}catch(e){}
+const t=k=>(T[S.lang][k]??T.uz[k]??k);
+const L=pair=>pair?pair[S.lang==="ru"?1:0]:"";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const canW=col=>!!(S.role&&WR[col]&&WR[col].includes(S.role));
+const store=(k,v)=>{try{localStorage.setItem(k,v);}catch(_){}};
+
+/* ---------- numbers & dates ---------- */
+const grp=s=>s.replace(/\B(?=(\d{3})+(?!\d))/g," ");
+function money(n){n=Math.round(+n||0);return (n<0?"−":"")+grp(String(Math.abs(n)));}
+function qty(n){n=+n||0;const r=Math.round(n*100)/100;const [i,f]=String(Math.abs(r)).split(".");return (r<0?"−":"")+grp(i)+(f?","+f:"");}
+const cur=()=>S.lang==="ru"?"сум":"сўм";
+const pnum=v=>{if(v===""||v==null)return NaN;return Number(String(v).replace(/[\s ]/g,"").replace(",","."));};
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>iso(new Date());
+const fdate=s=>s?s.slice(8,10)+"."+s.slice(5,7)+"."+s.slice(0,4):"";
+const mIdx=s=>(+s.slice(0,4))*12+(+s.slice(5,7)-1);
+const MONTHS=["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+function range(){
+  const d=new Date(),y=d.getFullYear(),m=d.getMonth();
+  switch(S.per){
+    case "month":return{from:iso(new Date(y,m,1)),to:iso(new Date(y,m+1,0))};
+    case "prev":return{from:iso(new Date(y,m-1,1)),to:iso(new Date(y,m,0))};
+    case "quarter":{const q=Math.floor(m/3)*3;return{from:iso(new Date(y,q,1)),to:iso(new Date(y,q+3,0))};}
+    case "year":return{from:y+"-01-01",to:y+"-12-31"};
+    case "custom":return{from:S.from||"1900-01-01",to:S.to||"2999-12-31"};
+    default:return null;
+  }
+}
+const inR=(r,dt)=>!r||(dt>=r.from&&dt<=r.to);
+
+/* ---------- lookups ---------- */
+const D=S.data;
+const byId=(c,id)=>D[c].find(x=>x.id===id);
+const dirs=()=>[...D.directions].sort((a,b)=>(a.order??99)-(b.order??99)||String(a.name).localeCompare(b.name));
+const dirName=id=>{if(!id)return t("general");const d=byId("directions",id);return d?(S.lang==="ru"&&d.name_ru?d.name_ru:d.name):"—";};
+const dirColor=id=>{const d=byId("directions",id);return d?"var(--c-"+(d.color||"steel")+")":"var(--muted)";};
+const dirTag=id=>`<span class="dot" style="--dc:${dirColor(id)}"></span>${esc(dirName(id))}`;
+const unitName=u=>L(UNITS[u])||u||"";
+const prodName=id=>{const p=byId("products",id);return p?p.name:"—";};
+const prodUnit=id=>{const p=byId("products",id);return p?unitName(p.unit):"";};
+const matName=id=>{const p=byId("materials",id);return p?p.name:"—";};
+const dirOk=x=>S.dir==="all"||x.dir===S.dir;
+const byDate=(a,b)=>(b.date||"").localeCompare(a.date||"")||String(b.ts||"").localeCompare(String(a.ts||""));
+
+/* ---------- computations ---------- */
+function avgPrice(mid){let q=0,v=0;D.moves.forEach(m=>{if(m.material===mid&&m.type==="in"){q+=m.qty;v+=m.qty*m.price;}});return q?v/q:0;}
+function deprMonths(a,r){
+  const life=+a.life||0;if(!life||!a.date)return 0;
+  const start=mIdx(a.date)+1,end=start+Math.round(life*12)-1,now=mIdx(today());
+  const lo=Math.max(start,r?mIdx(r.from):start),hi=Math.min(end,now,r?mIdx(r.to):now);
+  return Math.max(0,hi-lo+1);
+}
+const monthly=a=>(+a.life?(+a.cost||0)/(+a.life*12):0);
+function pnl(r){
+  const z=()=>({sales:0,other:0,mat:0,exp:0,cats:{},dep:0});
+  const m={"":z()};dirs().forEach(d=>m[d.id]=z());
+  const g=k=>m[k||""]||(m[k]=z());
+  D.sales.forEach(s=>{if(inR(r,s.date))g(s.dir).sales+=s.qty*s.price;});
+  D.incomes.forEach(s=>{if(inR(r,s.date))g(s.dir).other+=s.amount;});
+  D.moves.forEach(s=>{if(s.type==="out"&&inR(r,s.date))g(s.dir).mat+=s.qty*s.price;});
+  D.expenses.forEach(s=>{if(inR(r,s.date)){const o=g(s.dir);o.exp+=s.amount;o.cats[s.cat]=(o.cats[s.cat]||0)+s.amount;}});
+  D.assets.forEach(a=>{g(a.dir).dep+=monthly(a)*deprMonths(a,r);});
+  Object.values(m).forEach(o=>{o.rev=o.sales+o.other;o.cost=o.mat+o.exp+o.dep;o.profit=o.rev-o.cost;});
+  return m;
+}
+function summary(r){
+  const m=pnl(r);const keys=S.dir==="all"?Object.keys(m):[S.dir];
+  const o={rev:0,cost:0,profit:0};keys.forEach(k=>{const x=m[k];if(!x)return;o.rev+=x.rev;o.cost+=x.cost;o.profit+=x.profit;});
+  return o;
+}
+const saleTotal=s=>s.qty*s.price;
+const saleDebt=s=>Math.max(0,saleTotal(s)-(s.paid||0));
+const prodBal=pid=>{let b=0;D.production.forEach(x=>{if(x.product===pid)b+=x.qty;});D.sales.forEach(x=>{if(x.product===pid)b-=x.qty;});return b;};
+function stockRows(){
+  return D.products.filter(dirOk).map(p=>{
+    let pr=0,so=0;D.production.forEach(x=>{if(x.product===p.id)pr+=x.qty;});D.sales.forEach(x=>{if(x.product===p.id)so+=x.qty;});
+    return{p,pr,so,bal:pr-so,val:(pr-so)*(p.price||0)};
+  }).sort((a,b)=>(a.p.dir||"").localeCompare(b.p.dir||"")||a.p.name.localeCompare(b.p.name));
+}
+function matRows(){
+  return [...D.materials].sort((a,b)=>a.name.localeCompare(b.name)).map(mt=>{
+    let i=0,o=0;D.moves.forEach(m=>{if(m.material===mt.id){if(m.type==="in")i+=m.qty;else o+=m.qty;}});
+    const avg=avgPrice(mt.id),bal=i-o;return{mt,i,o,bal,avg,val:bal*avg,st:bal<=0?"out":(bal<(mt.min||0)?"low":"ok")};
+  });
+}
+
+/* ---------- tables ---------- */
+function table(spec){
+  S.tables[spec.name]=spec;
+  if(!spec.rows.length)return `<div class="empty"><b>${t("emptyT")}</b>${esc(spec.empty??t("emptyPeriod"))}</div>`;
+  const ed=spec.edit&&canW(spec.edit);
+  const hasTot=spec.cols.some(c=>c.tot);
+  let h=`<div class="tw"><table><thead><tr>${spec.cols.map(c=>`<th class="${c.n||c.m?"n":""}">${esc(c.l)}</th>`).join("")}${ed?"<th></th>":""}</tr></thead><tbody>`;
+  spec.rows.forEach(r=>{
+    h+="<tr>"+spec.cols.map(c=>{const raw=c.v(r);const html=c.h?c.h(r):(c.m?money(raw):c.n?qty(raw):esc(raw));return `<td class="${c.n||c.m?"n":""}${c.wrap?" wrap":""}">${html}</td>`;}).join("");
+    if(ed)h+=`<td class="n"><button class="btn sm" data-edit="${spec.edit}" data-id="${esc(spec.rowId?spec.rowId(r):r.id)}">${t("edit")}</button></td>`;
+    h+="</tr>";
+  });
+  if(hasTot){h+=`<tr class="tot">`+spec.cols.map((c,i)=>{if(c.tot){const s=spec.rows.reduce((a,r)=>a+(+c.v(r)||0),0);return `<td class="n">${c.m?money(s):qty(s)}</td>`;}return `<td>${i===0?t("total"):""}</td>`;}).join("")+(ed?"<td></td>":"")+"</tr>";}
+  return h+"</tbody></table></div>";
+}
+function csv(spec){
+  const q=v=>{v=String(v??"");return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const lines=[spec.cols.map(c=>q(c.l)).join(";")];
+  spec.rows.forEach(r=>lines.push(spec.cols.map(c=>{const v=c.v(r);return q(c.n||c.m?String(Math.round((+v||0)*100)/100).replace(".",","):v);}).join(";")));
+  return "﻿"+lines.join("\r\n");
+}
+const xbtn=name=>`<button class="btn sm" data-export="${name}">${t("excel")} ↓</button>`;
+const abtn=(col,label,preset,plain)=>canW(col)?`<button class="btn ${plain?"":"pri"}" data-add="${col}"${preset?` data-preset='${esc(JSON.stringify(preset))}'`:""}>+ ${esc(label)}</button>`:"";
+const panel=(title,acts,body)=>`<section class="panel"><div class="ph"><h2>${esc(title)}</h2><div class="acts">${acts||""}</div></div>${body}</section>`;
+
+/* ---------- views ---------- */
+const VIEWS={};
+VIEWS.dashboard=function(){
+  const r=range(),s=summary(r);
+  const debt=D.sales.filter(dirOk).reduce((a,x)=>a+saleDebt(x),0);
+  const nUnpaid=D.sales.filter(dirOk).filter(x=>saleDebt(x)>0).length;
+  const marg=s.rev?Math.round(s.profit/s.rev*100):0;
+  let h=`<div class="kpis">
+    <div class="kpi"><div class="l">${t("revenue")}</div><div class="v">${money(s.rev)}</div><div class="s">${cur()} · ${t("forPeriod")}</div></div>
+    <div class="kpi"><div class="l">${t("costs")}</div><div class="v">${money(s.cost)}</div><div class="s">${cur()} · ${t("forPeriod")}</div></div>
+    <div class="kpi"><div class="l">${t("profit")}</div><div class="v ${s.profit<0?"neg":"pos"}">${money(s.profit)}</div><div class="s">${t("margin")} ${marg}%</div></div>
+    <div class="kpi"><div class="l">${t("debts")}</div><div class="v">${money(debt)}</div><div class="s">${nUnpaid} ${t("unpaid")}</div></div></div>`;
+  const total=["production","sales","expenses","incomes","moves"].reduce((a,c)=>a+D[c].length,0);
+  if(!total)h+=`<div class="panel pb"><p class="help">${t("emptyDash")}</p><div style="margin-top:12px"><a class="btn" href="#catalog">${t("catalog")}</a></div></div>`;
+  if(S.dir==="all"){
+    const m=pnl(r);
+    const card=(id,x,click)=>`<${click?"button":"div"} class="dcard" style="--dc:${id?dirColor(id):"var(--muted)"};${click?"":"cursor:default"}" ${click?`data-setdir="${esc(id)}"`:""}><h3>${esc(dirName(id))}</h3><dl class="dl"><dt>${t("revenue")}</dt><dd>${money(x.rev)}</dd><dt>${t("costs")}</dt><dd>${money(x.cost)}</dd><dt>${t("profit")}</dt><dd class="${x.profit<0?"neg":"pos"}">${money(x.profit)}</dd></dl></${click?"button":"div"}>`;
+    h+=`<div class="dirs">`+dirs().map(d=>card(d.id,m[d.id],true)).join("")+card("",m[""],false)+`</div>`;
+  }
+  h+=`<div class="grid2">`+panel(t("chart12"),"",`<div class="pb chart">${chart()}</div>`)+panel(t("alerts"),"",`<div class="pb">${alerts()}</div>`)+`</div>`;
+  h+=panel(t("recent"),"",`<div class="pb">${recent()}</div>`);
+  return h;
+};
+function chart(){
+  const now=new Date(),pts=[];
+  for(let i=11;i>=0;i--){const a=new Date(now.getFullYear(),now.getMonth()-i,1),b=new Date(now.getFullYear(),now.getMonth()-i+1,0);const s=summary({from:iso(a),to:iso(b)});pts.push({l:MONTHS[a.getMonth()],rev:s.rev,cost:s.cost});}
+  const max=Math.max(1,...pts.map(p=>Math.max(p.rev,p.cost)));
+  const e=Math.pow(10,Math.floor(Math.log10(max))),f=max/e,nice=(f<=1?1:f<=2?2:f<=5?5:10)*e;
+  const W=640,H=230,L0=62,B=24,T0=8,cw=(W-L0-8)/12,ph=H-B-T0;
+  const y=v=>T0+ph-(v/nice)*ph;
+  const short=v=>v>=1e9?+(v/1e9).toFixed(1)+(S.lang==="ru"?" млрд":" млрд"):v>=1e6?+(v/1e6).toFixed(1)+" млн":v>=1e3?Math.round(v/1e3)+(S.lang==="ru"?" тыс":" минг"):String(v);
+  let g="";for(let i=0;i<=4;i++){const v=nice*i/4;g+=`<line x1="${L0}" x2="${W-8}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L0-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)">${short(v)}</text>`;}
+  pts.forEach((p,i)=>{const x=L0+i*cw+cw*0.15,bw=cw*0.33;
+    g+=`<rect x="${x}" y="${y(p.rev)}" width="${bw}" height="${Math.max(0,T0+ph-y(p.rev))}" rx="2" fill="var(--accent)"><title>${t("revenue")}: ${money(p.rev)}</title></rect>`;
+    g+=`<rect x="${x+bw+2}" y="${y(p.cost)}" width="${bw}" height="${Math.max(0,T0+ph-y(p.cost))}" rx="2" fill="var(--c-ochre)"><title>${t("costs")}: ${money(p.cost)}</title></rect>`;
+    g+=`<text x="${L0+i*cw+cw/2}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--muted)">${p.l}</text>`;});
+  return `<div class="legend"><span><i style="background:var(--accent)"></i>${t("revenue")}</span><span><i style="background:var(--c-ochre)"></i>${t("costs")}</span><span>${cur()}</span></div><svg viewBox="0 0 ${W} ${H}" role="img">${g}</svg>`;
+}
+function alerts(){
+  const items=[];
+  matRows().forEach(r=>{if(r.st!=="ok"&&(r.i>0||r.mt.min>0))items.push(`<div class="li"><span>${esc(r.mt.name)} <span class="m">${t("balance")}: ${qty(r.bal)} ${esc(unitName(r.mt.unit))}</span></span><span class="pill ${r.st==="out"?"bad":"warn"}">${t(r.st==="out"?"outOf":"low")}</span></div>`);});
+  stockRows().forEach(r=>{if(r.bal<0)items.push(`<div class="li"><span>${esc(r.p.name)} <span class="m">${qty(r.bal)} ${esc(unitName(r.p.unit))}</span></span><span class="pill bad">${t("negStock")}</span></div>`);});
+  const deb={};D.sales.filter(dirOk).forEach(s=>{const d=saleDebt(s);if(d>0){const k=s.client||"—";deb[k]=(deb[k]||0)+d;}});
+  Object.entries(deb).sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(([k,v])=>items.push(`<div class="li"><span>${esc(k)} <span class="m">${t("debt")}</span></span><span class="neg">${money(v)}</span></div>`));
+  return items.length?`<div class="list">${items.join("")}</div>`:`<p class="muted" style="margin:0">—</p>`;
+}
+function recent(){
+  const all=[...D.sales.map(x=>({...x,k:"sales"})),...D.production.map(x=>({...x,k:"production"})),...D.expenses.map(x=>({...x,k:"expenses"})),...D.incomes.map(x=>({...x,k:"incomes"}))].filter(dirOk).sort(byDate).slice(0,8);
+  if(!all.length)return `<p class="muted" style="margin:0">—</p>`;
+  return `<div class="list">`+all.map(x=>{
+    let a,b;
+    if(x.k==="sales"){a=`${t("sales")}: ${esc(prodName(x.product))}, ${qty(x.qty)} ${esc(prodUnit(x.product))} — ${esc(x.client||"")}`;b=`<span class="pos">+${money(saleTotal(x))}</span>`;}
+    else if(x.k==="production"){a=`${t("production")}: ${esc(prodName(x.product))}`;b=`${qty(x.qty)} ${esc(prodUnit(x.product))}`;}
+    else if(x.k==="expenses"){a=`${t("expenses")}: ${esc(L(ECATS[x.cat])||x.cat)}`;b=`<span class="neg">−${money(x.amount)}</span>`;}
+    else{a=`${t("incomes")}: ${esc(L(ICATS[x.cat])||x.cat)}`;b=`<span class="pos">+${money(x.amount)}</span>`;}
+    return `<div class="li"><span>${a}<br><span class="m">${fdate(x.date)} · ${esc(dirName(x.dir))}</span></span><span style="font-variant-numeric:tabular-nums">${b}</span></div>`;}).join("")+`</div>`;
+}
+VIEWS.production=function(){
+  const r=range();const rows=D.production.filter(x=>dirOk(x)&&inR(r,x.date)).sort(byDate);
+  const sums={};rows.forEach(x=>{sums[x.product]=(sums[x.product]||0)+x.qty;});
+  const chips=Object.entries(sums).map(([p,q])=>`<span class="chip">${esc(prodName(p))}<b>${qty(q)} ${esc(prodUnit(p))}</b></span>`).join("");
+  return (chips?`<div class="chips">${chips}</div>`:"")+panel(t("production"),xbtn("production")+abtn("production",t("addProduction")),table({name:"production",edit:"production",rows,cols:[
+    {l:t("date"),v:x=>fdate(x.date)},{l:t("product"),v:x=>prodName(x.product)},{l:t("direction"),v:x=>dirName(x.dir),h:x=>dirTag(x.dir)},
+    {l:t("qty"),v:x=>x.qty,n:1},{l:t("unit"),v:x=>prodUnit(x.product)},{l:t("note"),v:x=>x.note||"",wrap:1}]}));
+};
+VIEWS.sales=function(){
+  const r=range();const rows=D.sales.filter(x=>dirOk(x)&&inR(r,x.date)).sort(byDate);
+  const st=x=>{const d=saleDebt(x);return d<=0?["good","paidFull"]:(x.paid>0?["warn","paidPart"]:["bad","paidNone"]);};
+  return panel(t("sales"),xbtn("sales")+abtn("sales",t("addSale")),table({name:"sales",edit:"sales",rows,cols:[
+    {l:t("date"),v:x=>fdate(x.date)},{l:t("client"),v:x=>x.client||""},{l:t("product"),v:x=>prodName(x.product)},{l:t("direction"),v:x=>dirName(x.dir),h:x=>dirTag(x.dir)},
+    {l:t("qty"),v:x=>x.qty,n:1},{l:t("unit"),v:x=>prodUnit(x.product)},{l:t("price"),v:x=>x.price,m:1},{l:t("sum"),v:saleTotal,m:1,tot:1},{l:t("paid"),v:x=>x.paid||0,m:1,tot:1},{l:t("debt"),v:saleDebt,m:1,tot:1},
+    {l:t("status"),v:x=>t(st(x)[1]),h:x=>`<span class="pill ${st(x)[0]}">${t(st(x)[1])}</span>`}]}));
+};
+VIEWS.stock=function(){
+  return `<p class="help">${t("stockNote")}</p>`+panel(t("stock"),xbtn("stock"),table({name:"stock",rows:stockRows(),cols:[
+    {l:t("product"),v:x=>x.p.name},{l:t("direction"),v:x=>dirName(x.p.dir),h:x=>dirTag(x.p.dir)},{l:t("unit"),v:x=>unitName(x.p.unit)},
+    {l:t("produced"),v:x=>x.pr,n:1},{l:t("sold"),v:x=>x.so,n:1},{l:t("balance"),v:x=>x.bal,n:1,h:x=>`<span class="${x.bal<0?"neg":""}">${qty(x.bal)}</span>`},
+    {l:t("price"),v:x=>x.p.price||0,m:1},{l:t("value"),v:x=>x.val,m:1,tot:1}]}));
+};
+function opsView(col,cats,addLabel,extra){
+  const r=range();const rows=D[col].filter(x=>dirOk(x)&&inR(r,x.date)).sort(byDate);
+  const sums={};rows.forEach(x=>{sums[x.cat]=(sums[x.cat]||0)+x.amount;});
+  const chips=Object.entries(sums).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`<span class="chip">${esc(L(cats[c])||c)}<b>${money(v)}</b></span>`).join("");
+  return (chips?`<div class="chips">${chips}</div>`:"")+(extra||"")+panel(t(col),xbtn(col)+abtn(col,addLabel,S.dir!=="all"?{dir:S.dir}:null),table({name:col,edit:col,rows,cols:[
+    {l:t("date"),v:x=>fdate(x.date)},{l:t("direction"),v:x=>dirName(x.dir),h:x=>dirTag(x.dir)},{l:t("category"),v:x=>L(cats[x.cat])||x.cat},
+    {l:t("amount"),v:x=>x.amount,m:1,tot:1},{l:t("note"),v:x=>x.note||"",wrap:1}]}));
+}
+VIEWS.expenses=()=>opsView("expenses",ECATS,t("addExpense"),`<p class="help">${t("matHint")}</p>`);
+VIEWS.incomes=()=>opsView("incomes",ICATS,t("addIncome"));
+VIEWS.assets=function(){
+  const rows=D.assets.filter(dirOk).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  const acc=a=>monthly(a)*deprMonths(a,null);
+  return `<p class="help">${t("assetNote")}</p>`+panel(t("assets"),xbtn("assets")+abtn("assets",t("addAsset"),S.dir!=="all"?{dir:S.dir}:null),table({name:"assets",edit:"assets",rows,empty:"",cols:[
+    {l:t("invno"),v:x=>x.invno||""},{l:t("name"),v:x=>x.name,wrap:1},{l:t("direction"),v:x=>dirName(x.dir),h:x=>dirTag(x.dir)},{l:t("buyDate"),v:x=>fdate(x.date)},
+    {l:t("cost"),v:x=>x.cost,m:1,tot:1},{l:t("life"),v:x=>x.life,n:1},{l:t("monthDep"),v:monthly,m:1,tot:1},{l:t("accDep"),v:acc,m:1,tot:1},{l:t("resid"),v:x=>x.cost-acc(x),m:1,tot:1}]}));
+};
+VIEWS.warehouse=function(){
+  const stl=x=>x.st==="out"?"outOf":x.st==="low"?"low":"ok",stc=x=>x.st==="out"?"bad":x.st==="low"?"warn":"good";
+  const r=range();const mv=D.moves.filter(m=>inR(r,m.date)&&(S.dir==="all"||!m.dir||m.dir===S.dir)).sort(byDate);
+  return panel(t("balances"),xbtn("balances")+abtn("materials",t("addMaterial"),null,1),table({name:"balances",edit:"materials",rowId:x=>x.mt.id,rows:matRows(),empty:"",cols:[
+    {l:t("material"),v:x=>x.mt.name},{l:t("unit"),v:x=>unitName(x.mt.unit)},{l:t("inQ"),v:x=>x.i,n:1},{l:t("outQ"),v:x=>x.o,n:1},{l:t("balance"),v:x=>x.bal,n:1},
+    {l:t("avgPrice"),v:x=>x.avg,m:1},{l:t("value"),v:x=>x.val,m:1,tot:1},{l:t("status"),v:x=>t(stl(x)),h:x=>`<span class="pill ${stc(x)}">${t(stl(x))}</span>`}]}))+
+    panel(t("moves"),xbtn("moves")+abtn("moves",t("addIn"),{type:"in"})+abtn("moves",t("addOut"),{type:"out",dir:S.dir!=="all"?S.dir:""}),table({name:"moves",edit:"moves",rows:mv,cols:[
+    {l:t("date"),v:x=>fdate(x.date)},{l:t("type"),v:x=>t(x.type),h:x=>`<span class="pill ${x.type==="in"?"good":"warn"}">${t(x.type)}</span>`},{l:t("material"),v:x=>matName(x.material)},
+    {l:t("qty"),v:x=>x.qty,n:1},{l:t("unit"),v:x=>{const m=byId("materials",x.material);return m?unitName(m.unit):"";}},{l:t("price"),v:x=>x.price,m:1},{l:t("sum"),v:x=>x.qty*x.price,m:1,tot:1},
+    {l:t("direction"),v:x=>x.dir?dirName(x.dir):"",h:x=>x.dir?dirTag(x.dir):""},{l:t("note"),v:x=>x.note||"",wrap:1}]}));
+};
+VIEWS.reports=function(){
+  const m=pnl(range());const keys=[...dirs().map(d=>d.id),""].filter(k=>S.dir==="all"||k===S.dir);
+  const cats=Object.keys(ECATS).filter(c=>keys.some(k=>m[k]&&m[k].cats[c]));
+  const lines=[["salesRev",o=>o.sales],["otherInc",o=>o.other],["totalRev",o=>o.rev,1],["matUse",o=>o.mat],...cats.map(c=>[L(ECATS[c]),o=>o.cats[c]||0,0,1]),["depr",o=>o.dep],["totalCost",o=>o.cost,1],["profit",o=>o.profit,2]];
+  const cols=[{l:"",v:x=>x.lab,h:x=>x.b?`<b>${esc(x.lab)}</b>`:(x.ind?`<span style="padding-left:14px">${esc(x.lab)}</span>`:esc(x.lab))},
+    ...keys.map(k=>({l:dirName(k),v:x=>x.vals[k],m:1,h:x=>{const v=x.vals[k];const c=x.b===2?(v<0?"neg":"pos"):"";return `<span class="${c}">${x.b?"<b>":""}${money(v)}${x.b?"</b>":""}</span>`;}}))];
+  if(keys.length>1)cols.push({l:t("total"),v:x=>x.sum,m:1,h:x=>`<b class="${x.b===2?(x.sum<0?"neg":"pos"):""}">${money(x.sum)}</b>`});
+  const rows=lines.map(([k,f,b,ind])=>{const vals={};let sum=0;keys.forEach(kk=>{const v=m[kk]?f(m[kk]):0;vals[kk]=v;sum+=v;});return{lab:ind?k:t(k),vals,sum,b,ind};});
+  const deb={};D.sales.filter(dirOk).forEach(s=>{const d=saleDebt(s);if(d>0){const k=s.client||"—";deb[k]=deb[k]||{c:k,n:0,sum:0,last:""};deb[k].n++;deb[k].sum+=d;if(s.date>deb[k].last)deb[k].last=s.date;}});
+  return panel(t("pnl")+" · "+cur(),xbtn("pnl"),table({name:"pnl",rows,cols}))+
+    panel(t("debtors"),xbtn("debtors"),table({name:"debtors",rows:Object.values(deb).sort((a,b)=>b.sum-a.sum),empty:"",cols:[{l:t("client"),v:x=>x.c},{l:t("sales"),v:x=>x.n,n:1},{l:t("date"),v:x=>fdate(x.last)},{l:t("debt"),v:x=>x.sum,m:1,tot:1}]}));
+};
+VIEWS.catalog=function(){
+  return panel(t("dirsT"),abtn("directions",t("addDir")),table({name:"dirs",edit:"directions",rows:dirs(),empty:"",cols:[{l:t("name"),v:x=>x.name,h:x=>dirTag(x.id)},{l:t("nameRu"),v:x=>x.name_ru||""},
+      {l:t("productsT"),v:x=>D.products.filter(p=>p.dir===x.id).length,n:1}]}))+
+    panel(t("productsT"),xbtn("products")+abtn("products",t("addProduct"),S.dir!=="all"?{dir:S.dir}:null),table({name:"products",edit:"products",rows:D.products.filter(dirOk).sort((a,b)=>(a.dir||"").localeCompare(b.dir||"")||a.name.localeCompare(b.name)),empty:"",cols:[
+      {l:t("name"),v:x=>x.name},{l:t("direction"),v:x=>dirName(x.dir),h:x=>dirTag(x.dir)},{l:t("unit"),v:x=>unitName(x.unit)},{l:t("price"),v:x=>x.price||0,m:1}]}))+
+    panel(t("materialsT"),abtn("materials",t("addMaterial")),table({name:"materials",edit:"materials",rows:[...D.materials].sort((a,b)=>a.name.localeCompare(b.name)),empty:"",cols:[
+      {l:t("name"),v:x=>x.name},{l:t("unit"),v:x=>unitName(x.unit)},{l:t("minQ"),v:x=>x.min||0,n:1}]}));
+};
+VIEWS.users=function(){
+  const admin=S.role==="admin";
+  const rows=[...S.profiles].sort((a,b)=>ROLES.indexOf(a.role)-ROLES.indexOf(b.role)||String(a.full_name).localeCompare(b.full_name));
+  return `<p class="help">${t("usersHelp")}</p>`+panel(t("users"),"",table({name:"users",rows,empty:"",cols:[
+    {l:t("fullName"),v:x=>x.full_name+(x.id===S.user.id?" ✓":"")},
+    {l:t("role"),v:x=>t("r_"+x.role),h:x=>admin&&x.id!==S.user.id?`<select data-prole="${x.id}">${ROLES.map(r=>`<option value="${r}"${r===x.role?" selected":""}>${t("r_"+r)}</option>`).join("")}</select>`:esc(t("r_"+x.role))},
+    {l:t("active"),v:x=>t(x.active?"yes":"no"),h:x=>admin&&x.id!==S.user.id?`<select data-pact="${x.id}"><option value="1"${x.active?" selected":""}>${t("yes")}</option><option value="0"${!x.active?" selected":""}>${t("no")}</option></select>`:`<span class="pill ${x.active?"good":"bad"}">${t(x.active?"yes":"no")}</span>`},
+    {l:t("date"),v:x=>fdate((x.created_at||"").slice(0,10))}]}));
+};
+
+/* ---------- forms ---------- */
+const optDirs=g=>[...(g?[["",t("general")]]:[]),...dirs().map(d=>[d.id,dirName(d.id)])];
+const optProducts=()=>D.products.filter(p=>S.dir==="all"||p.dir===S.dir).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>[p.id,p.name+" · "+unitName(p.unit)]);
+const optUnits=()=>Object.keys(UNITS).map(u=>[u,unitName(u)]);
+const FORMS={
+  directions:{title:"dirsT",fields:[{k:"name",l:"name",req:1},{k:"name_ru",l:"nameRu"},{k:"color",l:"color",type:"select",opts:()=>COLORS.map(c=>[c,c]),def:()=>COLORS[D.directions.length%COLORS.length]},{k:"order",l:"order",type:"number",def:()=>D.directions.length+1}]},
+  products:{title:"productsT",fields:[{k:"name",l:"name",req:1,full:1},{k:"dir",l:"direction",type:"select",opts:()=>optDirs(false),req:1,def:()=>S.dir!=="all"?S.dir:""},{k:"unit",l:"unit",type:"select",opts:optUnits,def:()=>"pcs"},{k:"price",l:"price",type:"number",hint:()=>cur()}]},
+  materials:{title:"materialsT",fields:[{k:"name",l:"name",req:1,full:1},{k:"unit",l:"unit",type:"select",opts:optUnits,def:()=>"t"},{k:"min",l:"minQ",type:"number"}]},
+  production:{title:"production",fields:[{k:"date",l:"date",type:"date",req:1,def:today},{k:"product",l:"product",type:"select",opts:optProducts,req:1},{k:"qty",l:"qty",type:"number",req:1,hint:d=>d.product?prodUnit(d.product):""},{k:"note",l:"note",type:"textarea",full:1}],
+    prep:d=>{const p=byId("products",d.product);d.dir=p?p.dir:"";}},
+  sales:{title:"sales",fields:[{k:"date",l:"date",type:"date",req:1,def:today},{k:"client",l:"client",req:1},{k:"product",l:"product",type:"select",opts:optProducts,req:1,full:1,
+      hint:(d,rec)=>{if(!d.product)return"";const b=prodBal(d.product)+(rec&&rec.product===d.product?rec.qty:0);return [t("inStock")+" "+qty(b)+" "+prodUnit(d.product),b<pnum(d.qty)?"warn":""];},
+      change:(d,set)=>{const p=byId("products",d.product);if(p&&p.price)set("price",p.price);}},
+    {k:"qty",l:"qty",type:"number",req:1},{k:"price",l:"price",type:"number",req:1,hint:d=>{const q=pnum(d.qty),p=pnum(d.price);return (q>0&&p>0)?t("sum")+": "+money(q*p)+" "+cur():cur();}},
+    {k:"paid",l:"paid",type:"number",hint:()=>cur()},{k:"note",l:"note",type:"textarea",full:1}],
+    prep:d=>{const p=byId("products",d.product);d.dir=p?p.dir:"";}},
+  expenses:{title:"expenses",fields:[{k:"date",l:"date",type:"date",req:1,def:today},{k:"dir",l:"direction",type:"select",opts:()=>optDirs(true)},{k:"cat",l:"category",type:"select",opts:()=>Object.keys(ECATS).map(c=>[c,L(ECATS[c])]),def:()=>"salary"},{k:"amount",l:"amount",type:"number",req:1,hint:()=>cur()},{k:"note",l:"note",type:"textarea",full:1}]},
+  incomes:{title:"incomes",fields:[{k:"date",l:"date",type:"date",req:1,def:today},{k:"dir",l:"direction",type:"select",opts:()=>optDirs(true)},{k:"cat",l:"category",type:"select",opts:()=>Object.keys(ICATS).map(c=>[c,L(ICATS[c])]),def:()=>"service"},{k:"amount",l:"amount",type:"number",req:1,hint:()=>cur()},{k:"note",l:"note",type:"textarea",full:1}]},
+  assets:{title:"assets",fields:[{k:"name",l:"name",req:1,full:1},{k:"invno",l:"invno"},{k:"dir",l:"direction",type:"select",opts:()=>optDirs(true)},{k:"date",l:"buyDate",type:"date",req:1,def:today},{k:"cost",l:"cost",type:"number",req:1,hint:()=>cur()},
+    {k:"life",l:"life",type:"number",req:1,hint:d=>{const c=pnum(d.cost),l=pnum(d.life);return c>0&&l>0?money(c/(l*12))+" "+cur()+" "+t("perMonth"):"";}},{k:"note",l:"note",type:"textarea",full:1}]},
+  moves:{title:"moves",fields:[{k:"date",l:"date",type:"date",req:1,def:today},{k:"type",l:"type",type:"select",opts:()=>[["in",t("in")],["out",t("out")]],def:()=>"in"},
+    {k:"material",l:"material",type:"select",opts:()=>[...D.materials].sort((a,b)=>a.name.localeCompare(b.name)).map(m=>[m.id,m.name+" · "+unitName(m.unit)]),req:1,full:1,
+      hint:d=>{if(!d.material)return"";const r=matRows().find(x=>x.mt.id===d.material);return r?t("balance")+": "+qty(r.bal)+" "+unitName(r.mt.unit)+" · "+t("avgPrice")+": "+money(r.avg):"";}},
+    {k:"qty",l:"qty",type:"number",req:1},{k:"price",l:"price",type:"number",hint:d=>d.type==="out"?t("autoAvg"):cur()},
+    {k:"dir",l:"forDir",type:"select",opts:()=>optDirs(true),show:d=>d.type==="out"},{k:"note",l:"note",type:"textarea",full:1}],
+    prep:d=>{if(d.type==="out"&&!(d.price>0))d.price=Math.round(avgPrice(d.material));if(d.type==="in")d.dir="";}},
+};
+let F=null;
+function openForm(col,id,preset){
+  const spec=FORMS[col];const rec=id?byId(col,id):null;
+  const d={};spec.fields.forEach(f=>{d[f.k]=rec?(rec[f.k]??""):(preset&&preset[f.k]!=null?preset[f.k]:(f.def?f.def():""));});
+  F={col,id,rec,spec,d,delArm:false};
+  const fh=f=>{
+    const v=d[f.k]??"";let inp;
+    if(f.type==="select"){const o=f.opts();inp=`<select id="f_${f.k}">${f.req&&!v?`<option value="">—</option>`:""}${o.map(([k,l])=>`<option value="${esc(k)}"${String(k)===String(v)?" selected":""}>${esc(l)}</option>`).join("")}</select>`;}
+    else if(f.type==="textarea")inp=`<textarea id="f_${f.k}">${esc(v)}</textarea>`;
+    else inp=`<input id="f_${f.k}" type="${f.type==="date"?"date":"text"}" ${f.type==="number"?'inputmode="decimal"':""} value="${esc(v)}">`;
+    return `<div class="fld${f.full?" full":""}" id="w_${f.k}"><label for="f_${f.k}">${esc(t(f.l))}${f.req?" *":""}</label>${inp}<span class="hint" id="h_${f.k}"></span></div>`;
+  };
+  $("modal").innerHTML=`<div class="dialog" role="dialog" aria-modal="true"><h3>${esc(t(spec.title))} · ${rec?t("edit"):t("add")}</h3><form class="form" id="fform" novalidate>${spec.fields.map(fh).join("")}<div class="err" id="ferr"></div></form>
+    <div class="dfoot">${rec?`<button class="btn danger" id="fdel" type="button">${t("del")}</button>`:""}<div class="r"><button class="btn" id="fcancel" type="button">${t("cancel")}</button><button class="btn pri" id="fsave" type="button">${t("save")}</button></div></div></div>`;
+  $("modal").hidden=false;dyn();
+  const first=$("modal").querySelector("input,select,textarea");if(first)first.focus();
+}
+function readForm(){F.spec.fields.forEach(f=>{const el=$("f_"+f.k);if(el)F.d[f.k]=el.value;});return F.d;}
+function dyn(){
+  const d=readForm();
+  F.spec.fields.forEach(f=>{
+    if(f.show)$("w_"+f.k).hidden=!f.show(d);
+    const h=$("h_"+f.k);let v=f.hint?f.hint(d,F.rec):"";let cls="";if(Array.isArray(v)){cls=v[1];v=v[0];}h.textContent=v||"";h.className="hint "+(cls||"");
+  });
+}
+function closeForm(){$("modal").hidden=true;$("modal").innerHTML="";F=null;}
+const errText=e=>{const m=(e&&(e.message||e.code))||String(e);return /row-level security|permission/i.test(m)?t("noRight"):m;};
+async function saveForm(){
+  const d={...readForm()};const miss=[];
+  F.spec.fields.forEach(f=>{
+    if(f.show&&!f.show(d))d[f.k]="";
+    if(f.type==="number"){const v=pnum(d[f.k]);d[f.k]=isNaN(v)?0:v;if(f.req&&!(d[f.k]>0))miss.push(t(f.l));}
+    else{d[f.k]=String(d[f.k]||"").trim();if(f.req&&!d[f.k])miss.push(t(f.l));}
+  });
+  if(miss.length){$("ferr").textContent=t("required")+" "+miss.join(", ");return;}
+  if(F.spec.prep)F.spec.prep(d);
+  const m=MAP[F.col],row=m.to(d);
+  const btn=$("fsave");btn.disabled=true;
+  try{
+    let res;
+    if(F.id)res=await S.sb.from(m.table).update(row).eq("id",F.id).select();
+    else{if(F.col==="directions")row.id="d"+Date.now().toString(36);res=await S.sb.from(m.table).insert(row).select();}
+    if(res.error)throw res.error;
+    if(!res.data||!res.data.length)throw{message:t("noRight")};
+    const col=F.col;closeForm();toast(t("saved"));await loadCols([col]);
+  }catch(e){btn.disabled=false;$("ferr").textContent=t("writeErr")+" "+errText(e);}
+}
+async function delForm(){
+  const b=$("fdel");if(!F.delArm){F.delArm=true;b.textContent=t("delSure");return;}
+  b.disabled=true;
+  try{
+    const res=await S.sb.from(MAP[F.col].table).delete().eq("id",F.id).select();
+    if(res.error)throw res.error;if(!res.data||!res.data.length)throw{message:t("noRight")};
+    const col=F.col;closeForm();toast(t("deleted"));await loadCols([col]);
+  }catch(e){b.disabled=false;$("ferr").textContent=t("writeErr")+" "+errText(e);}
+}
+
+/* ---------- data loading ---------- */
+async function fetchAll(table){
+  const out=[];const step=1000;
+  for(let from=0;;from+=step){
+    const {data,error}=await S.sb.from(table).select("*").range(from,from+step-1);
+    if(error)throw error;out.push(...data);if(data.length<step)break;
+  }
+  return out;
+}
+async function loadCols(cols){
+  await Promise.all(cols.map(async c=>{const rows=await fetchAll(MAP[c].table);D[c].length=0;rows.forEach(r=>D[c].push(MAP[c].from(r)));}));
+  render();
+}
+async function loadProfiles(){
+  const {data,error}=await S.sb.from("profiles").select("*");
+  if(!error&&data){S.profiles=data;const me=data.find(p=>p.id===S.user.id);if(me){S.role=me.active?me.role:null;S.name=me.full_name;}}
+}
+async function loadAll(){
+  note(t("loading"));
+  try{await loadProfiles();await loadCols(COLS);note(S.role==="viewer"||!S.role?t("pending"):"");}
+  catch(e){note(t("loadErr")+" "+errText(e),"bad");}
+}
+
+/* ---------- export ---------- */
+function exportTable(name){
+  const spec=S.tables[name];if(!spec)return;
+  const blob=new Blob([csv(spec)],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name+"_"+today()+".csv";
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);toast(t("exported"));
+}
+
+/* ---------- chrome & render ---------- */
+const NAV=[["g_main",["dashboard","reports"]],["g_ops",["production","sales","expenses","incomes"]],["g_res",["stock","warehouse","assets"]],["g_set",["catalog","users"]]];
+function langBtns(){document.querySelectorAll(".lUz").forEach(b=>b.className="lUz"+(S.lang==="uz"?" on":""));document.querySelectorAll(".lRu").forEach(b=>b.className="lRu"+(S.lang==="ru"?" on":""));document.documentElement.lang=S.lang==="ru"?"ru":"uz";}
+function chrome(){
+  langBtns();
+  $("logoSub").textContent=t("sub");
+  const canUsers=S.role==="admin"||S.role==="manager";
+  $("nav").innerHTML=NAV.map(([g,items])=>`<div class="ngroup">${t(g)}</div>`+items.filter(v=>v!=="users"||canUsers).map(v=>`<a href="#${v}" class="${S.view===v?"on":""}">${t(v)}</a>`).join("")).join("");
+  $("vtitle").textContent=t(S.view);
+  if(S.dir!=="all"&&D.directions.length&&!byId("directions",S.dir))S.dir="all";
+  $("fDir").innerHTML=`<option value="all">${t("allDirs")}</option>`+dirs().map(d=>`<option value="${esc(d.id)}">${esc(dirName(d.id))}</option>`).join("");$("fDir").value=S.dir;
+  $("fPer").innerHTML=["month","prev","quarter","year","all","custom"].map(p=>`<option value="${p}">${t("p_"+p)}</option>`).join("");$("fPer").value=S.per;
+  $("fFrom").hidden=$("fTo").hidden=S.per!=="custom";
+  $("meName").textContent=S.name||(S.user&&S.user.email)||"";$("meRole").textContent=S.role?t("r_"+S.role):"";
+  $("logout").textContent=t("logout");$("refresh").title=t("refresh");
+}
+function render(){
+  if(!S.user)return renderAuth();
+  chrome();S.tables={};
+  if(S.view==="users"&&!(S.role==="admin"||S.role==="manager"))S.view="dashboard";
+  $("view").innerHTML=`<div style="display:flex;flex-direction:column;gap:20px">${(VIEWS[S.view]||VIEWS.dashboard)()}</div>`;
+}
+function note(msg,kind){const n=$("notice");if(!msg){n.hidden=true;return;}n.textContent=msg;n.dataset.kind=kind||"";n.hidden=false;}
+let tt;function toast(m){const e=$("toast");e.textContent=m;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,2600);}
+function route(){const h=location.hash.slice(1);S.view=VIEWS[h]?h:"dashboard";render();window.scrollTo(0,0);}
+
+/* ---------- auth ---------- */
+function renderAuth(){
+  $("appView").hidden=true;$("authView").hidden=false;langBtns();
+  const up=S.authMode==="up";
+  $("aSub").textContent=t("sub");$("tIn").textContent=t("signIn");$("tUp").textContent=t("signUp");
+  $("tIn").className=up?"":"on";$("tUp").className=up?"on":"";
+  $("aNameW").hidden=!up;$("aNameL").textContent=t("fullName");$("aPassL").textContent=t("password");
+  $("aBtn").textContent=up?t("signUp"):t("signIn");
+  $("aPass").autocomplete=up?"new-password":"current-password";
+}
+async function authSubmit(e){
+  e.preventDefault();$("aErr").textContent="";$("aOk").textContent="";
+  const email=$("aEmail").value.trim(),pass=$("aPass").value,name=$("aName").value.trim();
+  if(!email||!pass){$("aErr").textContent=t("needEmail");return;}
+  if(pass.length<6){$("aErr").textContent=t("passShort");return;}
+  $("aBtn").disabled=true;
+  try{
+    if(S.authMode==="up"){
+      const {data,error}=await S.sb.auth.signUp({email,password:pass,options:{data:{full_name:name||email},emailRedirectTo:location.href.split("#")[0]}});
+      if(error)throw error;
+      if(data.session)await onSession(data.session);else{$("aOk").textContent=t("signedUp");S.authMode="in";renderAuth();$("aOk").textContent=t("signedUp");}
+    }else{
+      const {data,error}=await S.sb.auth.signInWithPassword({email,password:pass});
+      if(error)throw{message:t("badLogin")};
+      await onSession(data.session);
+    }
+  }catch(err){$("aErr").textContent=err.message||String(err);}
+  $("aBtn").disabled=false;
+}
+async function onSession(session){
+  if(!session){S.user=null;S.role=null;renderAuth();return;}
+  if(S.user&&S.user.id===session.user.id)return;
+  S.user=session.user;$("authView").hidden=true;$("appView").hidden=false;
+  route();await loadAll();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-add]");if(a){openForm(a.dataset.add,null,a.dataset.preset?JSON.parse(a.dataset.preset):null);return;}
+  const ed=e.target.closest("[data-edit]");if(ed){openForm(ed.dataset.edit,ed.dataset.id);return;}
+  const x=e.target.closest("[data-export]");if(x){exportTable(x.dataset.export);return;}
+  const sd=e.target.closest("[data-setdir]");if(sd){S.dir=sd.dataset.setdir;store("bb.dir",S.dir);render();return;}
+  if(e.target.closest(".lUz")){S.lang="uz";store("bb.lang","uz");render();return;}
+  if(e.target.closest(".lRu")){S.lang="ru";store("bb.lang","ru");render();return;}
+  if(e.target.id==="fcancel"||e.target.id==="modal")closeForm();
+  if(e.target.id==="fsave")saveForm();
+  if(e.target.id==="fdel")delForm();
+});
+document.addEventListener("change",async e=>{
+  const r=e.target.dataset&&(e.target.dataset.prole||e.target.dataset.pact);if(!r)return;
+  const patch=e.target.dataset.prole?{role:e.target.value}:{active:e.target.value==="1"};
+  const res=await S.sb.from("profiles").update(patch).eq("id",r).select();
+  if(res.error||!res.data||!res.data.length){toast(t("writeErr")+" "+errText(res.error||{}));}else toast(t("saved"));
+  await loadProfiles();render();
+});
+$("modal").addEventListener("input",()=>{if(F)dyn();});
+$("modal").addEventListener("change",e=>{if(!F)return;const f=F.spec.fields.find(f=>"f_"+f.k===e.target.id);
+  if(f&&f.change)f.change(readForm(),(kk,v)=>{const el=$("f_"+kk);if(el)el.value=v;});dyn();});
+$("modal").addEventListener("keydown",e=>{if(e.key==="Escape")closeForm();if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault();saveForm();}});
+$("fDir").onchange=e=>{S.dir=e.target.value;store("bb.dir",S.dir);render();};
+$("fPer").onchange=e=>{S.per=e.target.value;store("bb.per",S.per);render();};
+$("fFrom").onchange=e=>{S.from=e.target.value;render();};$("fTo").onchange=e=>{S.to=e.target.value;render();};
+$("refresh").onclick=()=>loadAll();
+$("logout").onclick=async()=>{await S.sb.auth.signOut();S.user=null;S.role=null;COLS.forEach(c=>D[c].length=0);renderAuth();};
+$("tIn").onclick=()=>{S.authMode="in";renderAuth();};$("tUp").onclick=()=>{S.authMode="up";renderAuth();};
+$("aForm").addEventListener("submit",authSubmit);
+window.addEventListener("hashchange",route);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.user&&!F)loadAll();});
+
+/* ---------- boot ---------- */
+if(!window.supabase){document.body.innerHTML='<p style="padding:24px;font-family:sans-serif">Supabase кутубхонаси юкланмади. Интернет алоқасини текширинг.</p>';return;}
+S.sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+S.sb.auth.getSession().then(({data})=>onSession(data.session));
+S.sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>{if(ev==="SIGNED_OUT"){S.user=null;renderAuth();}else if(session&&(!S.user||S.user.id!==session.user.id))onSession(session);},0);});
+})();
+</script>
+</body>
+</html>
